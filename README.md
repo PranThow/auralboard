@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🔊 Auralboard
 
 A lightweight, open-source Python soundboard that plays MP3s via VB-Cable and supports real-time microphone passthrough.
