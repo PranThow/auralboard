@@ -1,0 +1,4 @@
+sounddevice
+pydub
+simpleaudio
+numpy
