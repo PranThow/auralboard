@@ -1,14 +1,14 @@
-<<<<<<< HEAD
 # 🔊 Auralboard
 
 A lightweight, open-source Python soundboard that plays MP3s via VB-Cable and supports real-time microphone passthrough.
 
 ## 📦 Download
 
-👉 [Download Auralboard v0.1a](https://github.com/PranThow/auralboard/releases/latest)  
+👉 [Download Auralboard v0.1-alpha](https://github.com/PranThow/auralboard/releases/latest)  
 No Python required — just double-click and go!
 
 ## 🚀 Features
+
 - Dynamic grid of MP3 buttons
 - Audio routed through VB-Cable
 - Hear-your-own-sound toggle
@@ -23,7 +23,7 @@ No Python required — just double-click and go!
 - ❗ Code is messy (first alpha) — expect bugs!
 - ❗ A ~0.5 second delay when playing a sound
 - ❗ A ~2.5 second delay when hearing a sound
--  And much more!
+- ❗ And much more!
 
 ## 🛣️ Roadmap
 
@@ -39,12 +39,14 @@ No Python required — just double-click and go!
 - ❌ Themes or skinning
 - ❌ Total rewrite in C++ or Rust
 
-💬 Got a feature idea? Submit an issue!
+💬 Got a feature idea? Submit an [issue](https://github.com/PranThow/auralboard/issues)!
 
 ## 📃 Requirements
+
 - Python 3.9 or newer
 - VB-Cable (Install from [vb-audio.com/Cable](https://vb-audio.com/Cable/))
-- Dependencies in `requirements.txt`
+- Dependencies listed in `requirements.txt`
+
 
 ## 🔊 VB-Cable Required (But Don't Worry!)
 
@@ -53,7 +55,8 @@ This app uses **VB-Cable** to route sound to virtual outputs. It’s free but mu
 > 🛠️ **Auto-install coming soon!**  
 > The app will eventually install VB-Cable for you — no tech skills needed.
 
-### 🔗 Install Instructions:
+### 🔗 VB-Cable Install Instructions:
+
 1. Go to [vb-audio.com/Cable](https://vb-audio.com/Cable/)
 2. Download and extract the ZIP
 3. Run `VBCABLE_Setup_x64.exe` **as Administrator**
@@ -63,6 +66,7 @@ This app uses **VB-Cable** to route sound to virtual outputs. It’s free but mu
 ⚠️ If VB-Cable isn’t installed, the app won’t be able to play or route audio!
 
 ## 🧰 FFmpeg
+
 This app includes a bundled copy of FFmpeg in `ffmpeg/bin/ffmpeg.exe` for audio decoding.
 
 FFmpeg is licensed under the [LGPL/GPL license](https://ffmpeg.org/legal.html).
@@ -72,8 +76,3 @@ FFmpeg is licensed under the [LGPL/GPL license](https://ffmpeg.org/legal.html).
 ```bash
 pip install -r requirements.txt
 python main.py
-```
-
-## 📄 License
-
-Licensed under the **GNU GPLv3** — see [LICENSE](LICENSE) for details.  
