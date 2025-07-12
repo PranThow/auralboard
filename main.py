@@ -178,25 +178,31 @@ def on_mic_selected(event=None):
 def play_mp3(btn):
     entry = button_file_map.get(btn)
     if entry:
+        original_label = btn.cget("text")  # Save original label
+
         def do_play():
-            # Always play to VB-Cable
+            btn.config(text="Playing...")  # Show playing status
+            btn.state(["disabled"])        # Optional: disable button while playing
+
             try:
-                play(entry["wav"])  # your existing VB-Cable function
+                play(entry["wav"])  # VB-Cable playback
             except Exception as e:
                 print(f"VB-Cable playback error: {e}")
 
-            # If toggle is ON, also play locally
             if hear_soundboard_var.get():
                 try:
                     wave = sa.WaveObject.from_wave_file(entry["wav"])
-                    wave.play()
+                    play_obj = wave.play()
+                    play_obj.wait_done()  # Wait until local playback finishes
                 except Exception as e:
                     print(f"Local playback error: {e}")
+
+            btn.config(text=original_label)
+            btn.state(["!disabled"])       # Re-enable button
+
         threading.Thread(target=do_play, daemon=True).start()
     else:
         messagebox.showwarning("No File", "Please select an MP3 file first.")
-
-
 
 # ---------------- MP3 Button Grid ---------------- #
 def pick_mp3_file(btn):
