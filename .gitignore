@@ -73,3 +73,4 @@ docs/_build/
 ffmpeg/ffmpeg.exe
 *.wav
 save.json
+main.exe
