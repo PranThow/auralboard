@@ -1,77 +1,87 @@
 # 🔊 Auralboard
 
-A lightweight, open-source Python soundboard that plays MP3s via VB-Cable and supports real-time microphone passthrough.
+🎙️ A lightweight, open-source soundboard built in Python.  
+Plays MP3s via VB-Cable and supports real-time mic passthrough.
+
+## ⚠️ Notice — FFmpeg Not Bundled in `.exe` Yet!
+
+**The current `.exe` build does _not_ include FFmpeg.**  
+Please use the **Python version** until the next release. Thank you!
 
 ## 📦 Download
 
 👉 [Download Auralboard v0.1-alpha](https://github.com/PranThow/auralboard/releases/latest)  
-No Python required — just double-click and go!
+_No Python required – just double-click and go!_  
+⚠️ *MP3 playback requires FFmpeg (Python version only for now).*
 
 ## 🚀 Features
 
 - Dynamic grid of MP3 buttons
 - Audio routed through VB-Cable
-- Hear-your-own-sound toggle
-- Mic passthrough to VB-Cable output
-- Saves and loads layouts (save.json)
+- “Hear your own soundboard” toggle
+- Mic passthrough to VB-Cable
+- Saves/loads grid layout from `save.json`
 
 ## ⚠️ Known Issues
 
-- ❗ GUI can lag or freeze with large soundboards
-- ❗ Some systems may have audio glitches during heavy playback
-- ❗ No visual confirmation when a sound finishes
-- ❗ Code is messy (first alpha) — expect bugs!
-- ❗ A ~0.5 second delay when playing a sound
-- ❗ A ~2.5 second delay when hearing a sound
-- ❗ And much more!
+### 🎵 Audio / Playback
+
+- ❗ ~0.5s delay when playing a sound *(fixed in next release!)*
+- ❗ ~2.5s delay when monitoring via “hear” *(fixed in next release!)*
+- ❗ No visual feedback when sound ends *(fixed in next release!)*
+- ❗ Occasional audio glitches if spamming buttons
+
+### 🖱️ GUI
+
+- ❗ UI may lag with many buttons
+- ❗ Buttons don’t show “playing” state yet *(next release!)*
+- ❗ No drag-and-drop or keybinds *(planned)*
 
 ## 🛣️ Roadmap
 
-- ✅ Add VB-Cable compatibility
-- ✅ GUI-based grid system
-- ✅ `.exe` build for non-coders
-- ❌ Keybinds
-- ❌ Drag-and-drop sound support
-- ❌ Visual feedback when sound plays
-- ❌ Auto-install VB-Cable
-- ❌ Looping / stop buttons
-- ❌ Volume control per sound
-- ❌ Themes or skinning
-- ❌ Total rewrite in C++ or Rust
+- ✅ VB-Cable support
+- ✅ Grid GUI layout
+- ✅ Standalone `.exe` build
+- ✅ Layout saving/loading
+- 🔜 Visual feedback on play/pause *(next release for pause only)*
+- 🔜 Full C++ rewrite *(partial in next release)*
+- 🔜 Stop buttons *(next release!)*
+- 🔜 Auto-install VB-Cable
+- 🔜 Drag-and-drop support
+- 🔜 Looping + per-button volume
+- 🔜 Custom skins/themes
+- 🔜 Keybinds
 
-💬 Got a feature idea? Submit an [issue](https://github.com/PranThow/auralboard/issues)!
+💡 Got an idea? [Submit an issue!](https://github.com/PranThow/auralboard/issues)
 
-## 📃 Requirements
+## 📃 Requirements (Python Version Only)
 
-- Python 3.9 or newer
-- VB-Cable (Install from [vb-audio.com/Cable](https://vb-audio.com/Cable/))
+- Python 3.9+
+- VB-Cable ([Download here](https://vb-audio.com/Cable/))
+- FFmpeg (included in `/ffmpeg/` folder)
 - Dependencies listed in `requirements.txt`
 
+## 🔊 VB-Cable Setup
 
-## 🔊 VB-Cable Required (But Don't Worry!)
-
-This app uses **VB-Cable** to route sound to virtual outputs. It’s free but must be installed manually (for now).
-
-> 🛠️ **Auto-install coming soon!**  
-> The app will eventually install VB-Cable for you — no tech skills needed.
-
-### 🔗 VB-Cable Install Instructions:
+This app **requires VB-Cable** to route sound to virtual outputs.  
+It’s free and takes 2 minutes to install:
 
 1. Go to [vb-audio.com/Cable](https://vb-audio.com/Cable/)
 2. Download and extract the ZIP
-3. Run `VBCABLE_Setup_x64.exe` **as Administrator**
+3. Run `VBCABLE_Setup_x64.exe` as **Administrator**
 4. Click “Install Driver”
-5. Reboot your computer
+5. **Reboot your computer**
 
-⚠️ If VB-Cable isn’t installed, the app won’t be able to play or route audio!
+> 🛠️ Auto-installation coming in future updates!
 
-## 🧰 FFmpeg
+## 🧰 FFmpeg (Python Version Only)
 
-This app includes a bundled copy of FFmpeg in `ffmpeg/bin/ffmpeg.exe` for audio decoding.
+Auralboard uses FFmpeg to decode MP3s.  
+FFmpeg is licensed under [LGPL/GPL](https://ffmpeg.org/legal.html).
 
-FFmpeg is licensed under the [LGPL/GPL license](https://ffmpeg.org/legal.html).
+> ⚠️ The `.exe` version **does not bundle FFmpeg** yet — only the Python version supports MP3 playback currently.
 
-## 🔧 Installation
+## 🔧 Installation (Python version)
 
 ```bash
 pip install -r requirements.txt
