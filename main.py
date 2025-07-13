@@ -5,6 +5,7 @@ import os
 import json
 import tempfile
 import subprocess
+import sys
 from pydub import AudioSegment
 from tkinter import ttk, messagebox, filedialog
 
@@ -225,12 +226,11 @@ def play_mp3(btn):
         # --- Push to VB-Cable using pushaudio.py ---
         try:
             vb_proc = subprocess.Popen(
-                ["python", "pushaudio.py", entry["wav"]],
+                ["./resources/pushaudio.exe", entry["wav"]],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
                 creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
             )
-            processes.append(vb_proc)
         except Exception as e:
             print(f"Error starting pushaudio.py: {e}")
 
@@ -238,7 +238,7 @@ def play_mp3(btn):
         if hear_soundboard_var.get():
             try:
                 local_proc = subprocess.Popen(
-                    ["audioplay.exe", entry["wav"]],
+                    ["./resources/audioplay.exe", entry["wav"]],
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.DEVNULL,
                     creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
