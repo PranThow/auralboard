@@ -4,18 +4,32 @@ import threading
 import os
 import json
 import tempfile
-import simpleaudio as sa
+import subprocess
 from pydub import AudioSegment
 from tkinter import ttk, messagebox, filedialog
-from pushaudio import play
 
-# ---------------- Global Variables ---------------- #
+# Global Variables
 stream = None
 button_file_map = {}
 temp_dir = os.path.join(tempfile.gettempdir(), "auralboard_wavcache")
 os.makedirs(temp_dir, exist_ok=True)
+active_buttons = {}  # key = button, value = {'proc': Popen, 'thread': Thread}
+playing_processes = []
+vb_proc = None
+context_menu_button = None
 
-# ---------------- Wav Conversion ---------------- #
+def stop_all_audio():
+    for entry in button_file_map.values():
+        if "processes" in entry:
+            for proc in entry["processes"]:
+                if proc.poll() is None:
+                    try:
+                        proc.terminate()
+                    except Exception as e:
+                        print(f"Failed to terminate audio process: {e}")
+            entry["processes"].clear()
+
+# Convert MP3 to WAV
 def convert_to_wav(mp3_path):
     base = os.path.basename(mp3_path)
     wav_filename = os.path.splitext(base)[0] + ".wav"
@@ -30,7 +44,7 @@ def convert_to_wav(mp3_path):
 
     return wav_path
 
-# ---------------- Saveing & Loading ---------------- #
+# Saving and Loading Button Layout
 def save_button_map():
     data = {}
     for widget in button_frame.winfo_children():
@@ -85,6 +99,9 @@ def load_button_map():
             else:
                 btn.config(text="Pick MP3", command=lambda b=btn: pick_mp3_file(b))
 
+            # ✅ Add right-click binding here
+            btn.bind("<Button-3>", lambda e, b=btn: on_right_click(e, b))
+
     for r in range(max_row):
         button_frame.grid_rowconfigure(r, weight=1)
     for c in range(max_col):
@@ -93,7 +110,7 @@ def load_button_map():
     width_var.set(str(max_col))
     height_var.set(str(max_row))
 
-# ---------------- Microphone Handling ---------------- #
+# Microphone Management
 def get_filtered_mics():
     devices = sd.query_devices()
     mics = []
@@ -125,7 +142,7 @@ def find_device_by_name(partial_name, is_input=True):
                 return i
     return None
 
-# ---------------- Passthrough ---------------- #
+# Passthrough Audio Stream
 def audio_callback(indata, outdata, frames, time, status):
     if status:
         print(f"Stream warning: {status}")
@@ -174,37 +191,76 @@ def on_mic_selected(event=None):
         return
     threading.Thread(target=lambda: start_passthrough(mic_name), daemon=True).start()
 
-# ---------------- MP3 Playback ---------------- #
 def play_mp3(btn):
     entry = button_file_map.get(btn)
-    if entry:
-        original_label = btn.cget("text")  # Save original label
-
-        def do_play():
-            btn.config(text="Playing...")  # Show playing status
-            btn.state(["disabled"])        # Optional: disable button while playing
-
-            try:
-                play(entry["wav"])  # VB-Cable playback
-            except Exception as e:
-                print(f"VB-Cable playback error: {e}")
-
-            if hear_soundboard_var.get():
-                try:
-                    wave = sa.WaveObject.from_wave_file(entry["wav"])
-                    play_obj = wave.play()
-                    play_obj.wait_done()  # Wait until local playback finishes
-                except Exception as e:
-                    print(f"Local playback error: {e}")
-
-            btn.config(text=original_label)
-            btn.state(["!disabled"])       # Re-enable button
-
-        threading.Thread(target=do_play, daemon=True).start()
-    else:
+    if not entry:
         messagebox.showwarning("No File", "Please select an MP3 file first.")
+        return
 
-# ---------------- MP3 Button Grid ---------------- #
+    original_label = os.path.basename(entry["mp3"])
+
+    # === STOP if already playing ===
+    if "processes" in entry and entry["processes"]:
+        for proc in entry["processes"]:
+            if proc.poll() is None:
+                try:
+                    proc.terminate()
+                except Exception as e:
+                    print(f"Failed to terminate process: {e}")
+        entry["processes"].clear()
+
+        # Restore button state
+        btn.config(text=original_label)
+        btn.config(command=lambda b=btn: play_mp3(b))
+        return
+
+    # === START playback ===
+    btn.config(text="Stop")
+    btn.config(command=lambda b=btn: play_mp3(b))
+    entry["processes"] = []
+
+    def do_play():
+        processes = []
+
+        # --- Push to VB-Cable using pushaudio.py ---
+        try:
+            vb_proc = subprocess.Popen(
+                ["python", "pushaudio.py", entry["wav"]],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
+            )
+            processes.append(vb_proc)
+        except Exception as e:
+            print(f"Error starting pushaudio.py: {e}")
+
+        # --- Local playback using audioplay.exe ---
+        if hear_soundboard_var.get():
+            try:
+                local_proc = subprocess.Popen(
+                    ["audioplay.exe", entry["wav"]],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
+                )
+                processes.append(local_proc)
+            except Exception as e:
+                print(f"Error starting audioplay.exe: {e}")
+
+        # Save processes for later stop
+        entry["processes"] = processes
+
+        # Wait for VB-Cable subprocess to finish
+        vb_proc.wait()
+
+        # Reset button after finish
+        btn.config(text=original_label)
+        btn.config(command=lambda b=btn: play_mp3(b))
+        entry["processes"] = []
+
+    threading.Thread(target=do_play, daemon=True).start()
+
+# Button Grid
 def pick_mp3_file(btn):
     mp3_path = filedialog.askopenfilename(filetypes=[("MP3 files", "*.mp3")])
     if mp3_path:
@@ -220,6 +276,11 @@ def pick_mp3_file(btn):
         btn.config(text=os.path.basename(mp3_path))
         btn.config(command=lambda b=btn: play_mp3(b))
         save_button_map()
+
+def on_right_click(event, btn):
+    global context_menu_button
+    context_menu_button = btn
+    context_menu.post(event.x_root, event.y_root)
 
 def create_grid():
     try:
@@ -257,6 +318,9 @@ def create_grid():
             else:
                 btn.config(text="Pick MP3", command=lambda b=btn: pick_mp3_file(b))
 
+            # ✅ Add right-click binding here
+            btn.bind("<Button-3>", lambda e, b=btn: on_right_click(e, b))
+
     for r in range(rows):
         button_frame.grid_rowconfigure(r, weight=1)
     for c in range(cols):
@@ -264,12 +328,31 @@ def create_grid():
 
     save_button_map()
 
-# ---------------- GUI Setup ---------------- #
+def change_mp3_file(btn):
+    mp3_path = filedialog.askopenfilename(filetypes=[("MP3 files", "*.mp3")])
+    if mp3_path:
+        wav_path = convert_to_wav(mp3_path)
+        if not wav_path:
+            messagebox.showerror("Error", "Failed to convert MP3 to WAV.")
+            return
+
+        button_file_map[btn] = {
+            "mp3": mp3_path,
+            "wav": wav_path
+        }
+        btn.config(text=os.path.basename(mp3_path))
+        btn.config(command=lambda b=btn: play_mp3(b))
+        save_button_map()
+
+# GUI Setup
 root = tk.Tk()
 root.title("Auralboard")
 root.geometry("700x500")
-root.minsize(350, 400)
-root.protocol("WM_DELETE_WINDOW", lambda: (stop_passthrough(), root.destroy()))
+root.minsize(600, 400)
+root.protocol("WM_DELETE_WINDOW", lambda: (stop_passthrough(), stop_all_audio(), root.destroy()))
+
+context_menu = tk.Menu(root, tearoff=0)
+context_menu.add_command(label="Change MP3", command=lambda: change_mp3_file(context_menu_button))
 
 hear_soundboard_var = tk.BooleanVar(value=True)
 

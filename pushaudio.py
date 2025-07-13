@@ -3,6 +3,7 @@ import os
 import sounddevice as sd
 from pydub import AudioSegment
 import numpy as np
+import subprocess
 
 # Configure ffmpeg
 def configure_ffmpeg():
@@ -47,15 +48,19 @@ def load_audio(file_path, sample_rate=48000):
 # Play the audio file through VB-Cable
 def play(file_path, device_name="CABLE Input", sample_rate=48000):
     configure_ffmpeg()
-
     device_id = find_output_device(device_name)
     if device_id is None:
         raise RuntimeError(f"Output device '{device_name}' not found.")
-    
+
     samples = load_audio(file_path, sample_rate)
-    
+
     try:
-        sd.play(samples, samplerate=sample_rate, device=device_id, blocking=True)
+        stream = sd.OutputStream(samplerate=sample_rate, device=device_id,
+                                 channels=samples.shape[1], dtype='float32')
+        stream.start()
+        stream.write(samples)
+        stream.stop()
+        stream.close()
     except Exception as e:
         raise RuntimeError(f"Failed to play audio: {e}")
 
