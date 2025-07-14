@@ -3,7 +3,7 @@
 🎙️ A lightweight, open-source soundboard built in Python.  
 Plays MP3s via VB-Cable and supports real-time mic passthrough.
 
-## ⚠️ VERSION 0.2-ALPHA IS FINALLY HERE
+## ‼️ VERSION 0.2-ALPHA IS FINALLY HERE
 
 Version 0.2-Alpha is finally here! This major update includes
 
@@ -18,6 +18,18 @@ Version 0.2-Alpha is finally here! This major update includes
 
 👉 [Download Auralboard v0.2-alpha for Windows 8.1+ x64](https://github.com/PranThow/auralboard/releases/download/v0.2-alpha/auralboard-win-v0.2-alpha.exe)  
 
+## 🖥️ High-DPI Display Flix (Blurry Text on 4K)
+
+If the app looks blrury or fuzzy on a high-resolution monitor (like 4K), it's due to Windows scaling
+
+### 🔧 Fix:
+
+1. Right-click the `.exe` or `main.py`
+2. Click Properties > Compatibility
+3. Click `Change high DPI settings`
+4. Check `Override high DPI scaling behavior`
+5. Set scaling performed by: `Application`
+
 ## 🚀 Features
 
 - Dynamic grid of MP3 buttons
@@ -31,6 +43,7 @@ Version 0.2-Alpha is finally here! This major update includes
 ### 🖱️ GUI
 
 - ❗ UI may lag with many buttons
+- ❗ Blurry text when used on a 4K monitor due to Windows scaling
 
 ## 🛣️ Roadmap
 
