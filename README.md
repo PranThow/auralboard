@@ -80,9 +80,9 @@ It’s free and takes 2 minutes to install:
 4. Click “Install Driver”
 5. **Reboot your computer**
 
-> 🛠️ Auto-installation coming in future updates!
+> 🛠️ Auto-installation coming soon!
 
-## 🧰 FFmpeg (Python Version Only)
+## 🧰 FFmpeg
 
 Auralboard uses FFmpeg to decode MP3s.  
 FFmpeg is licensed under [LGPL/GPL](https://ffmpeg.org/legal.html).
